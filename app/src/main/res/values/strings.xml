@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">SoL App</string>
+
+    <string name="title_section1">Home</string>
+    <string name="title_section2">Mail</string>
+    <string name="title_section3">Events</string>
+    <string name="title_section4">Clan Forum</string>
+    <string name="title_section5">My Page</string>
+    <string name="title_section6">Web View</string>
+    <string name="title_section7">Log Out</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Refresh</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login">SoL App</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_mail_reply">Mail Sending</string>
+    <string name="title_activity_internet">InternetActivity</string>
+</resources>
