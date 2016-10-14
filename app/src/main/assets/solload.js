@@ -1,16 +1,4 @@
-function loadScript(url, callback) {
-
-    var head = document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = url;
-    script.onload = callback;
-    head.appendChild(script);
-}
-
 function loadBootstrap(){
-
-
     $("body").css("margin", '0');
     $("body").css("margin-top", "60px");
     $("body").css("word-break", "break-word");
@@ -18,9 +6,7 @@ function loadBootstrap(){
     var background = $("body").css("background-color");
 
     var head = $('head');
-    head.append('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">' +
-    '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"/>' +
-    '<meta name="viewport" content="width=device-width, initial-scale=1">');
+    head.append('<meta name="viewport" content="width=device-width, initial-scale=1">');
     var body = $('body');
     var originalBody = body.children();
     body.append("<div class='container' id='container'></div>");
@@ -168,4 +154,4 @@ function loadBootstrap(){
     $("#container").attr('padding-right', '0px');
 }
 
-loadScript('https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js', loadBootstrap);
+loadBootstrap();

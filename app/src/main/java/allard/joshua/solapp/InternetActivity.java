@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
@@ -12,6 +14,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpCookie;
 
@@ -20,6 +23,8 @@ public class InternetActivity extends BaseActivity {
 
     private static String solJs = "";
     private static String jqueryJs = "";
+    private static String bootstrapJs = "";
+    private static String bootstrapCss = "";
     private static boolean isFirst;
     private static String setCookie = "";
     private WebView mWebView;
@@ -57,7 +62,7 @@ public class InternetActivity extends BaseActivity {
         mWebView.getSettings().setJavaScriptEnabled(true);
         //mWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         mWebView.getSettings().setAppCacheEnabled(true);
-        mWebView.getSettings().setBuiltInZoomControls(true);
+        //mWebView.getSettings().setBuiltInZoomControls(true);
 
         isFirst = true;
 
@@ -67,6 +72,7 @@ public class InternetActivity extends BaseActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
 
+                //mWebView.setVisibility(View.INVISIBLE);
                 cookieManager.setCookie(url, setCookie);
                 return super.shouldOverrideUrlLoading(view, url);
                 //return true;
@@ -93,9 +99,15 @@ public class InternetActivity extends BaseActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 //CookieManager.getInstance().flush();
-                super.onPageFinished(view, url);
-                String javascript = "javascript: " + solJs;
+                String javascript = "javascript: " + jqueryJs;
                 view.loadUrl(javascript);
+                String javascript2 = "javascript: " + solJs;
+                view.loadUrl(javascript2);
+                String javascript3 = "javascript: " + bootstrapJs;
+                view.loadUrl(javascript3);
+                injectCSS();
+                super.onPageFinished(view, url);
+                mWebView.setVisibility(View.VISIBLE);
 
             }
 
@@ -128,9 +140,16 @@ public class InternetActivity extends BaseActivity {
         setTitle("Web View");
     }
 
+    @Override
+    public void onBackPressed() {
+        mWebView.goBack();
+    }
+
     public static void returnToActivity(final Activity activity, String url){
         solJs = readFile(activity, "solload.js");
         jqueryJs = readFile(activity, "jquery.min.js");
+        bootstrapJs = readFile(activity, "bootstrap.min.js");
+        bootstrapCss = readFile(activity, "bootstrap.min.css");
 
         if(!url.startsWith("http"))
             url = "http://www.samuraioflegend.com/" + url;
@@ -168,6 +187,27 @@ public class InternetActivity extends BaseActivity {
 
         Log.d("file", file);
         return file;
+    }
+    // Inject CSS method: read style.css from assets folder
+// Append stylesheet to document head
+    private void injectCSS() {
+        try {
+            InputStream inputStream = getAssets().open("bootstrap.min.css");
+            byte[] buffer = new byte[inputStream.available()];
+            inputStream.read(buffer);
+            inputStream.close();
+            String encoded = Base64.encodeToString(buffer, Base64.NO_WRAP);
+            mWebView.loadUrl("javascript:(function() {" +
+                    "var parent = document.getElementsByTagName('head').item(0);" +
+                    "var style = document.createElement('style');" +
+                    "style.type = 'text/css';" +
+                    // Tell the browser to BASE64-decode the string into your script !!!
+                    "style.innerHTML = window.atob('" + encoded + "');" +
+                    "parent.appendChild(style)" +
+                    "})()");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
