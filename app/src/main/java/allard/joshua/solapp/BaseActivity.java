@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import allard.joshua.solapp.parser.PageParser;
+
 /**
  * Created by Joshua on 11/3/2015.
  */
@@ -35,6 +37,8 @@ public class BaseActivity extends AppCompatActivity
     boolean duringSetup = false;
 
     protected BaseActivity activity = this;
+
+    protected String[] actions = null;
 
 
 
@@ -62,33 +66,7 @@ public class BaseActivity extends AppCompatActivity
     public void onNavigationDrawerItemSelected(int position) {
 
         if(!duringSetup) {
-            switch (position) {
-                case 0:
-                    //mTitle = getString(R.string.title_section1);
-                    MainActivity.returnToMainActivity(this);
-                    break;
-                case 1:
-                    MailboxActivity.returnToActivity(this);
-                    //mTitle = getString(R.string.title_section2);
-                    break;
-                case 2:
-                    //mTitle = getString(R.string.title_section3);
-                    EventActivity.returnToActivity(this);
-                    break;
-                case 3:
-                    ForumActivity.returnToActivity(this);
-                    //mTitle = getString(R.string.title_section3);
-                    break;
-                case 4:
-                    UserActivity.returnToActivity(this, Connector.currentStatus.id);
-                    break;
-                case 5:
-                    InternetActivity.returnToActivity(this, "explore.php");
-                    break;
-                case 6:
-                    LoginActivity.returnToActivity(this);
-                    break;
-            }
+            InternetActivity.returnToActivity(activity, actions[position]);
         }
     }
 

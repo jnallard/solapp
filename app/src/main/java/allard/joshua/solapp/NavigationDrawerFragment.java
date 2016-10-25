@@ -22,6 +22,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import allard.joshua.solapp.parser.PageParser;
+
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
@@ -51,7 +53,8 @@ public class NavigationDrawerFragment extends Fragment {
     private ActionBarDrawerToggle mDrawerToggle;
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerListView;
+    private static ListView mDrawerListView;
+    private static NavigationDrawerFragment latestInstance;
     private View mFragmentContainerView;
 
     private int mCurrentSelectedPosition = 0;
@@ -63,6 +66,7 @@ public class NavigationDrawerFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        latestInstance = this;
         super.onCreate(savedInstanceState);
 
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
@@ -103,8 +107,8 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.id.text1,
                 new String[]{
                         getString(R.string.title_section1),
-                        getString(R.string.title_section2) + " (" + Connector.currentStatus.mails + ")",
-                        getString(R.string.title_section3) + " (" + Connector.currentStatus.events + ")",
+                        PageParser.GetTemplateInfo().Mails,
+                        PageParser.GetTemplateInfo().Events,
                         getString(R.string.title_section4),
                         getString(R.string.title_section5),
                         getString(R.string.title_section6),
@@ -112,6 +116,14 @@ public class NavigationDrawerFragment extends Fragment {
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
+    }
+
+    public static void updateLinks(String[] links){
+        mDrawerListView.setAdapter(new ArrayAdapter<String>(
+                latestInstance.getActionBar().getThemedContext(),
+                android.R.layout.simple_list_item_activated_1,
+                android.R.id.text1,
+                links));
     }
 
     public boolean isDrawerOpen() {

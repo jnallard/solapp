@@ -4,30 +4,38 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Base64;
+import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpCookie;
+import java.util.List;
 
 public class InternetActivity extends BaseActivity {
     private static String pageUrl;
 
     private static String solJs = "";
+    private static String templateHtml = "";
     private static String jqueryJs = "";
     private static String bootstrapJs = "";
     private static String bootstrapCss = "";
     private static boolean isFirst;
     private static String setCookie = "";
     private WebView mWebView;
+
+    private String html = "";
+    private boolean loadingMyPage = false;
 
 
     @Override
@@ -87,7 +95,57 @@ public class InternetActivity extends BaseActivity {
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
+                Log.d("url", url);
+                /*if(url.startsWith("https://www.samuraioflegend.com")){
+                    super.onPageStarted(view, url, favicon);
+                    return;
+                }*/
+                if(loadingMyPage) return;
+                url = url.replace("http://www.samuraioflegend.com", "");
+
+                try{
+                    loadingMyPage = true;
+                    List<String> lines = Connector.loadPage(null, url);
+                    StringBuilder builder = new StringBuilder();
+                    for(String s: lines){
+                        builder.append(s);
+                    }
+                    html = builder.toString();
+                    Document doc = Jsoup.parse(html);
+
+                    String head = doc.select("head").html();
+                    head = "";
+                    String content = doc.select("td[width=\"83%\"]").html();
+                    Elements links = doc.select("td[width=\"260\"]").select("a");
+                    String[] newLinks = new String[links.size()];
+                    String[] newActions = new String[links.size()];
+                    int count = 0;
+                    for(Element e : links){
+                        newLinks[count] = e.text();
+                        newActions[count++] = e.attr("href");
+                    }
+                    NavigationDrawerFragment.updateLinks(newLinks);
+                    actions = newActions;
+
+                    html = templateHtml.replace("[[SCRIPTS]]", jqueryJs + bootstrapJs).replace("[[CSS]]", getCSS()).replace("[[HEAD]]", head).replace("[[CONTENT]]", content);
+                    html = html.replaceAll("<img", "<img class=\"img img-responsive\" ");
+                    html = html.replaceAll("<input", "<input class=\"btn btn-block\" ");
+                    html = html.replaceAll("width=\"([0-9]{1,4})\"", "");
+                    Log.d("html", html);
+
+                    view.stopLoading();
+                    view.loadDataWithBaseURL("http://www.samuraioflegend.com/", html, "text/html", "utf-8", "");
+                    /*String javascript = "javascript: " + jqueryJs;
+                    view.loadUrl(javascript);
+                    String javascript2 = "javascript: " + solJs;
+                    view.loadUrl(javascript2);
+                    String javascript3 = "javascript: " + bootstrapJs;
+                    view.loadUrl(javascript3);*/
+                    //CookieManager.getInstance().flush();
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
 
 
                 //String javascript = "<P>Hello World</p>";
@@ -98,17 +156,8 @@ public class InternetActivity extends BaseActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                //CookieManager.getInstance().flush();
-                String javascript = "javascript: " + jqueryJs;
-                view.loadUrl(javascript);
-                String javascript2 = "javascript: " + solJs;
-                view.loadUrl(javascript2);
-                String javascript3 = "javascript: " + bootstrapJs;
-                view.loadUrl(javascript3);
-                injectCSS();
                 super.onPageFinished(view, url);
-                mWebView.setVisibility(View.VISIBLE);
-
+                loadingMyPage = false;
             }
 
         });
@@ -146,10 +195,11 @@ public class InternetActivity extends BaseActivity {
     }
 
     public static void returnToActivity(final Activity activity, String url){
-        solJs = readFile(activity, "solload.js");
-        jqueryJs = readFile(activity, "jquery.min.js");
-        bootstrapJs = readFile(activity, "bootstrap.min.js");
-        bootstrapCss = readFile(activity, "bootstrap.min.css");
+        solJs = getScript(activity, "solload.js");
+        jqueryJs = getScript(activity, "jquery.min.js");
+        bootstrapJs = getScript(activity, "bootstrap.min.js");
+        bootstrapCss = getScript(activity, "bootstrap.min.css");
+        templateHtml = getFile(activity, "template.html");
 
         if(!url.startsWith("http"))
             url = "http://www.samuraioflegend.com/" + url;
@@ -168,10 +218,17 @@ public class InternetActivity extends BaseActivity {
         activity.finish();
     }
 
-    private static String readFile(Activity activity, String filename) {
+    private static String getScript(Activity activity, String filename) {
+        String file = getFile(activity, filename);
+
+        Log.d("file", file);
+        return "<script>" + file + "</script>";
+    }
+
+    @NonNull
+    private static String getFile(Activity activity, String filename) {
         String file = "";
         try {
-            file = "";
             InputStreamReader is = new InputStreamReader(activity.getAssets()
                     .open(filename));
 
@@ -184,30 +241,13 @@ public class InternetActivity extends BaseActivity {
         catch (Exception ex){
             ex.printStackTrace();
         }
-
-        Log.d("file", file);
         return file;
     }
+
     // Inject CSS method: read style.css from assets folder
 // Append stylesheet to document head
-    private void injectCSS() {
-        try {
-            InputStream inputStream = getAssets().open("bootstrap.min.css");
-            byte[] buffer = new byte[inputStream.available()];
-            inputStream.read(buffer);
-            inputStream.close();
-            String encoded = Base64.encodeToString(buffer, Base64.NO_WRAP);
-            mWebView.loadUrl("javascript:(function() {" +
-                    "var parent = document.getElementsByTagName('head').item(0);" +
-                    "var style = document.createElement('style');" +
-                    "style.type = 'text/css';" +
-                    // Tell the browser to BASE64-decode the string into your script !!!
-                    "style.innerHTML = window.atob('" + encoded + "');" +
-                    "parent.appendChild(style)" +
-                    "})()");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private String getCSS() {
+        return "<style>" + getFile(this, "bootstrap.min.css") + "</style>";
     }
 
     @Override

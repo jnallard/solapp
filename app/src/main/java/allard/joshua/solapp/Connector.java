@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import allard.joshua.solapp.parser.PageParser;
+
 
 public class Connector {
 
@@ -29,7 +31,6 @@ public class Connector {
 
     public static boolean loggedIn = false;
 
-    public static SiteStatus currentStatus;
     public static java.net.CookieManager cm;
 
     public static void login(Activity main, String username, String password) {
@@ -63,8 +64,8 @@ public class Connector {
                 Log.d("Debug", "3: " + lines.size());
                 if (lines.size() > 5) {
                     Connector.loggedIn = true;
-                    currentStatus = new SiteStatus(lines);
-                    MainActivity.returnToMainActivity(activity);
+                    PageParser.GetInstance().Parse(lines);
+                    InternetActivity.returnToActivity(activity, "/explore.php");
                 }
                 //Connector.activity.text.setText("Success ");
 
@@ -167,7 +168,7 @@ public class Connector {
                     lines.add(line);
                 }
 
-                currentStatus = new SiteStatus(lines);
+                PageParser.GetInstance().Parse(lines);
                 return lines;
                 //return contentAsString;
 
