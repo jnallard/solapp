@@ -66,6 +66,10 @@ public class BaseActivity extends AppCompatActivity
     public void onNavigationDrawerItemSelected(int position) {
 
         if(!duringSetup) {
+            if(actions[position].contains("logout.php")){
+                LoginActivity.returnToActivity(activity);
+                return;
+            }
             InternetActivity.returnToActivity(activity, actions[position]);
         }
     }

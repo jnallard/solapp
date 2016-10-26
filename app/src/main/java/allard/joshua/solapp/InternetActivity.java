@@ -36,6 +36,7 @@ public class InternetActivity extends BaseActivity {
 
     private String html = "";
     private boolean loadingMyPage = false;
+    private String currentUrl = "";
 
 
     @Override
@@ -57,20 +58,13 @@ public class InternetActivity extends BaseActivity {
                     .toString();
             cookieManager.setCookie(pageUrl, setCookie);
             cookieSyncManager.sync();
-            //SystemClock.sleep(1000);
-            /*Log.d("cookie domain", c.getDomain());
-            cookie = c;*/
         }
 
         cookieSyncManager.sync();
-       // SystemClock.sleep(1000);
 
 
-        //mWebView = (WebView) findViewById(R.id.webView);
         mWebView.getSettings().setJavaScriptEnabled(true);
-        //mWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         mWebView.getSettings().setAppCacheEnabled(true);
-        //mWebView.getSettings().setBuiltInZoomControls(true);
 
         isFirst = true;
 
@@ -79,29 +73,19 @@ public class InternetActivity extends BaseActivity {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-
-                //mWebView.setVisibility(View.INVISIBLE);
                 cookieManager.setCookie(url, setCookie);
                 return super.shouldOverrideUrlLoading(view, url);
-                //return true;
             }
-
-            /*@Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-
-                cookieManager.setCookie(url, setCookie);
-                return super.shouldInterceptRequest(view, url);
-            }*/
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 Log.d("url", url);
-                /*if(url.startsWith("https://www.samuraioflegend.com")){
-                    super.onPageStarted(view, url, favicon);
-                    return;
-                }*/
                 if(loadingMyPage) return;
+                currentUrl = url;
+                pageUrl = currentUrl;
                 url = url.replace("http://www.samuraioflegend.com", "");
+
+                url = handlePostExceptions(url);
 
                 try{
                     loadingMyPage = true;
@@ -135,23 +119,10 @@ public class InternetActivity extends BaseActivity {
 
                     view.stopLoading();
                     view.loadDataWithBaseURL("http://www.samuraioflegend.com/", html, "text/html", "utf-8", "");
-                    /*String javascript = "javascript: " + jqueryJs;
-                    view.loadUrl(javascript);
-                    String javascript2 = "javascript: " + solJs;
-                    view.loadUrl(javascript2);
-                    String javascript3 = "javascript: " + bootstrapJs;
-                    view.loadUrl(javascript3);*/
-                    //CookieManager.getInstance().flush();
                 }
                 catch(Exception e){
                     e.printStackTrace();
                 }
-
-
-                //String javascript = "<P>Hello World</p>";
-                //view.loadUrl("https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js");
-                //view.loadUrl("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css");
-                //view.loadUrl("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js");
             }
 
             @Override
@@ -162,31 +133,16 @@ public class InternetActivity extends BaseActivity {
 
         });
 
-        /*if(cookie != null) {
-            CookieSyncManager.createInstance(mWebView.getContext());
-            CookieSyncManager.getInstance().startSync();
-            //CookieManager cookieManager = CookieManager.getInstance();
-            CookieManager.getInstance().setAcceptCookie(true);
-            CookieManager.getInstance().removeSessionCookie();
-            SystemClock.sleep(1000);
-            CookieManager.getInstance().setCookie("http://" + cookie.getDomain() + "/", cookie.toString());
-            CookieSyncManager.getInstance().sync();
-        }*/
-
-        /*try {
-            String postMessage = "username=" + URLEncoder.encode(Connector.username, "utf-8") + "&password=" + URLEncoder.encode(Connector.password, "utf-8") + "&myselect=World+1&login=Login";
-            URL siteUrl = new URL("http://www.samuraioflegend.com/authenticate.php");
-            mWebView.postUrl(siteUrl.toString(), postMessage.getBytes());
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-        }*/
         mWebView.loadUrl(pageUrl);
-        //setContentView(mWebView);
-
-        //setContentView(R.layout.activity_main);
 
         setTitle("Web View");
+    }
+
+    private String handlePostExceptions(String url){
+        if(url.contains("/forums.php?reply")){
+            return url.replace("reply", "viewtopic") + "&lastpost=1";
+        }
+        return url;
     }
 
     @Override
@@ -207,11 +163,6 @@ public class InternetActivity extends BaseActivity {
         Log.d("url", url);
 
         InternetActivity.pageUrl = url;
-
-
-
-        //HttpCookie cookie = null;
-
 
         Intent mainIntent = new Intent(activity, InternetActivity.class);
         activity.startActivity(mainIntent);
@@ -244,14 +195,12 @@ public class InternetActivity extends BaseActivity {
         return file;
     }
 
-    // Inject CSS method: read style.css from assets folder
-// Append stylesheet to document head
     private String getCSS() {
         return "<style>" + getFile(this, "bootstrap.min.css") + "</style>";
     }
 
     @Override
     public void refresh() {
-        mWebView.reload();
+        mWebView.loadUrl(currentUrl);
     }
 }
