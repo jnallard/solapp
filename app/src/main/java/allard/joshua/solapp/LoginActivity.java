@@ -13,10 +13,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity {
 
-
+    private static String message = null;
 
     EditText username;
     EditText password;
@@ -31,6 +32,13 @@ public class LoginActivity extends AppCompatActivity {
         username.setText(prefs.getString("usernameKey", ""));
         password = (EditText) findViewById(R.id.editText2);
         password.setText(prefs.getString("passwordKey", ""));
+
+        if(message != null){
+            Log.d("test", message);
+            Toast.makeText(this, message,
+                    Toast.LENGTH_LONG).show();
+            message = null;
+        }
     }
 
     public void connectToSite(View view){
@@ -66,7 +74,8 @@ public class LoginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static void returnToActivity(final Activity activity){
+    public static void returnToActivity(final Activity activity, String newMessage){
+        message = newMessage;
         Intent mainIntent = new Intent(activity, LoginActivity.class);
         activity.startActivity(mainIntent);
         activity.finish();

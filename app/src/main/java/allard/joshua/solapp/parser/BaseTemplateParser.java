@@ -24,13 +24,18 @@ public abstract class BaseTemplateParser {
     public void Parse(List<String> lines){
         doc = GetDocument(lines);
 
-        UpdateUser();
+        try {
+            UpdateUser();
 
-        UpdateID();
+            UpdateID();
 
-        UpdateMails();
+            UpdateMails();
 
-        UpdateEvents();
+            UpdateEvents();
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     protected void UpdateUser(){
@@ -59,7 +64,7 @@ public abstract class BaseTemplateParser {
         Log.d("Events", Events);
     }
 
-    protected Document GetDocument(List<String> lines){
+    public Document GetDocument(List<String> lines){
         String page = "";
         for(String s: lines){
             page += s + "\n";

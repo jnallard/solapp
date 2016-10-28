@@ -8,6 +8,7 @@ import java.util.List;
 
 public class PageParser {
     BaseTemplateParser templateParser = new BlueTemplateParser();
+    public boolean loggedOut = false;
 
     private PageParser(){
 

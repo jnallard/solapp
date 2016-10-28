@@ -67,7 +67,7 @@ public class BaseActivity extends AppCompatActivity
 
         if(!duringSetup) {
             if(actions[position].contains("logout.php")){
-                LoginActivity.returnToActivity(activity);
+                LoginActivity.returnToActivity(activity, null);
                 return;
             }
             InternetActivity.returnToActivity(activity, actions[position]);
