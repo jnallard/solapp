@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.Console;
@@ -21,58 +22,16 @@ public abstract class BaseTemplateParser {
     public String Mails = "";
     public String Events = "";
 
-    public void Parse(List<String> lines){
-        doc = GetDocument(lines);
-
-        try {
-            UpdateUser();
-
-            UpdateID();
-
-            UpdateMails();
-
-            UpdateEvents();
-        }
-        catch(Exception ex){
-            ex.printStackTrace();
-        }
-    }
-
-    protected void UpdateUser(){
-        Elements e = doc.select("font");
-        String text = e.first().text();
-        User = text.substring(5, text.indexOf("Money:"));
-
-        Log.d("User", User);
-    }
-
-    protected void UpdateID(){
-        ID = User.substring(User.lastIndexOf('[') + 1, User.lastIndexOf(']'));
-
-        Log.d("ID", ID);
-    }
-
-    protected void UpdateMails(){
-        Elements e = doc.select(":containsOwn(Mail)");
-        Mails = e.first().text();
-        Log.d("Mails", Mails);
-    }
-
-    protected void UpdateEvents(){
-        Elements e = doc.select(":containsOwn(Events)");
-        Events = e.first().text();
-        Log.d("Events", Events);
-    }
-
-    public Document GetDocument(List<String> lines){
-        String page = "";
-        for(String s: lines){
-            page += s + "\n";
-        }
-        //Spanned html = Html.fromHtml(page);
-        return Jsoup.parse(page);
+    public void Parse(Document doc){
+        this.doc = doc;
     }
 
 
+    public Elements GetLinks(){
+        return doc.select("td[width=\"260\"]").select("a");
+    }
 
+    public Element GetContent(){
+        return doc.select("td[width=\"83%\"]").first();
+    }
 }

@@ -67,7 +67,7 @@ public class BaseActivity extends AppCompatActivity
 
         if(!duringSetup) {
             if(actions[position].contains("logout.php")){
-                LoginActivity.returnToActivity(activity, null);
+                LoginActivity.returnToActivity(activity, "You have logged out");
                 return;
             }
             InternetActivity.returnToActivity(activity, actions[position]);
@@ -164,7 +164,7 @@ public class BaseActivity extends AppCompatActivity
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
+            ((BaseActivity) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }

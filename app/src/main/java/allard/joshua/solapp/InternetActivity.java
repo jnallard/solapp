@@ -94,10 +94,16 @@ public class InternetActivity extends BaseActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 Log.d("url", url);
+
                 if (url.contains("http") && !url.contains("samuraioflegend.com")) {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     startActivity(browserIntent);
                     view.stopLoading();
+                    return;
+                }
+
+                if(url.contains("login.php")){
+                    LoginActivity.returnToActivity(activity, "You were automatically logged out");
                     return;
                 }
 
@@ -110,32 +116,28 @@ public class InternetActivity extends BaseActivity {
 
                 try {
                     loadingMyPage = true;
-                    List<String> lines = Connector.loadPage(null, url);
-                    StringBuilder builder = new StringBuilder();
-                    for (String s : lines) {
-                        builder.append(s);
-                    }
-                    html = builder.toString();
-                    Document doc = PageParser.GetTemplateInfo().GetDocument(lines);
+                    Connector.loadPage(null, url);
 
-                    String head = doc.select("head").html();
-                    head = "";
-                    String content = doc.select("td[width=\"83%\"]").html();
-                    Elements links = doc.select("td[width=\"260\"]").select("a");
+                    String head = "";
+                    String content = PageParser.GetTemplateInfo().GetContent().html();
+                    Elements links = PageParser.GetTemplateInfo().GetLinks();
                     String[] newLinks = new String[links.size()];
                     String[] newActions = new String[links.size()];
                     int count = 0;
+                    boolean containsLogout = false;
                     for (Element e : links) {
                         newLinks[count] = e.text();
                         newActions[count++] = e.attr("href");
+                        containsLogout |= e.text().equalsIgnoreCase("logout");
                     }
 
-                    if(count > 0) {
+                    if(containsLogout) {
                         NavigationDrawerFragment.updateLinks(newLinks);
                         actions = newActions;
                     }
                     else{
                         LoginActivity.returnToActivity(activity, "Unable to load page - returning to log in page");
+                        return;
                     }
 
                     html = templateHtml.replace("[[SCRIPTS]]", jqueryJs + bootstrapJs).replace("[[CSS]]", getCSS()).replace("[[HEAD]]", head).replace("[[CONTENT]]", content);
@@ -161,7 +163,7 @@ public class InternetActivity extends BaseActivity {
 
         mWebView.loadUrl(pageUrl);
 
-        setTitle("Web View");
+        setTitle("SoL Mobile");
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -171,7 +173,16 @@ public class InternetActivity extends BaseActivity {
         if (url.contains("/forums.php?reply")) {
             return url.replace("reply", "viewtopic") + "&lastpost=1";
         }
+        if (url.contains("/mailbox.php?action=send")) {
+            return url.replace("?action=send", "");
+        }
         return url;
+    }
+
+    private String getCustomCss(String url){
+
+
+        return "";
     }
 
     @Override
