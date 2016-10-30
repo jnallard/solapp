@@ -38,7 +38,11 @@ public class BaseActivity extends AppCompatActivity
 
     protected BaseActivity activity = this;
 
-    protected String[] actions = null;
+    private String[] actions = null;
+
+    protected void setActions(String[] newActions){
+        actions = newActions;
+    }
 
 
 

@@ -32,6 +32,7 @@ import java.util.List;
 import allard.joshua.solapp.parser.PageParser;
 
 public class InternetActivity extends BaseActivity {
+    public static final String TITLE = "SoL Mobile";
     private static String pageUrl;
 
     private static String solJs = "";
@@ -45,6 +46,7 @@ public class InternetActivity extends BaseActivity {
 
     private String html = "";
     private boolean loadingMyPage = false;
+    private boolean pageHandled = false;
     private String currentUrl = "";
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -96,7 +98,7 @@ public class InternetActivity extends BaseActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 String newUrl = handlePostExceptions(url);
-                if(!newUrl.equals(url)){
+                if(newUrl != null && !pageHandled){
                     handlePageLoading(view, newUrl);
                 }
             }
@@ -105,6 +107,7 @@ public class InternetActivity extends BaseActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 loadingMyPage = false;
+                pageHandled = false;
             }
 
         });
@@ -112,7 +115,7 @@ public class InternetActivity extends BaseActivity {
         //mWebView.loadUrl(pageUrl);
         handlePageLoading(mWebView, pageUrl);
 
-        setTitle("SoL Mobile");
+        //setTitle(TITLE);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -122,6 +125,7 @@ public class InternetActivity extends BaseActivity {
 
     private void handlePageLoading(WebView view, String url) {
         Log.d("url", url);
+        pageHandled = true;
 
         if (url.contains("http") && !url.contains("samuraioflegend.com")) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -140,8 +144,6 @@ public class InternetActivity extends BaseActivity {
         pageUrl = currentUrl;
         url = url.replace("http://www.samuraioflegend.com", "");
 
-        url = handlePostExceptions(url);
-
         try {
             loadingMyPage = true;
             Connector.loadPage(null, url);
@@ -152,16 +154,53 @@ public class InternetActivity extends BaseActivity {
             String[] newLinks = new String[links.size()];
             String[] newActions = new String[links.size()];
             int count = 0;
+
+            int mailCount = 0;
+            int eventCount = 0;
+            int announcementCount = 0;
             boolean containsLogout = false;
             for (Element e : links) {
-                newLinks[count] = e.text();
+                String text = e.text();
+                if(text.startsWith("You Have Mail")){
+                    mailCount = Integer.parseInt(text.substring(text.indexOf("(") + 1, text.indexOf(")")));
+                    Log.d("Mails", mailCount + "");
+                }
+
+                if(text.startsWith("Events")){
+                    eventCount = Integer.parseInt(text.substring(text.indexOf("(") + 1, text.indexOf(")")));
+                    Log.d("Events", eventCount + "");
+                }
+
+                if(text.startsWith("Announcements")){
+                    announcementCount = Integer.parseInt(text.substring(text.indexOf("(") + 1, text.indexOf(")")));
+                    Log.d("Announcements", announcementCount + "");
+                }
+
+                newLinks[count] = text;
                 newActions[count++] = e.attr("href");
                 containsLogout |= e.text().equalsIgnoreCase("logout");
             }
 
+            if(mailCount + eventCount + announcementCount > 0){
+                String newTitle = "New ";
+                if(mailCount > 0){
+                    newTitle += "Mails (" + mailCount + "), ";
+                }
+                if(eventCount > 0){
+                    newTitle += "Events (" + eventCount + "), ";
+                }
+                if(announcementCount > 0){
+                    newTitle += "Announcements (" + announcementCount + "), ";
+                }
+                setTitle(newTitle);
+            }
+            else{
+                setTitle(TITLE);
+            }
+
             if(containsLogout) {
                 NavigationDrawerFragment.updateLinks(newLinks);
-                actions = newActions;
+                setActions(newActions);
             }
             else{
                 LoginActivity.returnToActivity(activity, "Unable to load page - returning to log in page");
@@ -188,7 +227,10 @@ public class InternetActivity extends BaseActivity {
         if (url.contains("/mailbox.php?action=send")) {
             return url.replace("?action=send", "");
         }
-        return url;
+        if (url.contains("/viewuser.php?u=")) {
+            return url;
+        }
+        return null;
     }
 
     private String getCustomCss(String url){
