@@ -72,10 +72,11 @@ public class PageParser {
 
     private Templates GetTemplate(){
         String css = doc.select("link[rel=\"stylesheet\"]").attr("href");
-        Log.d("css", css);
+        Log.d("css", "[" + css + "]");
         switch(css){
             default:
                 return Templates.BLUE;
+            case "/halloween/style_hallo.css":
             case "style_alogin.css":
                 return Templates.GREEN;
             case "http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700,600":
