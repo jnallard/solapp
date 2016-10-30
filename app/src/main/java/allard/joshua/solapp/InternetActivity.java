@@ -88,68 +88,16 @@ public class InternetActivity extends BaseActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 cookieManager.setCookie(url, setCookie);
-                return super.shouldOverrideUrlLoading(view, url);
+                view.stopLoading();
+                handlePageLoading(view, url);
+                return true;
             }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                Log.d("url", url);
-
-                if (url.contains("http") && !url.contains("samuraioflegend.com")) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    startActivity(browserIntent);
-                    view.stopLoading();
-                    return;
-                }
-
-                if(url.contains("login.php")){
-                    LoginActivity.returnToActivity(activity, "You were automatically logged out");
-                    return;
-                }
-
-                if (loadingMyPage) return;
-                currentUrl = url;
-                pageUrl = currentUrl;
-                url = url.replace("http://www.samuraioflegend.com", "");
-
-                url = handlePostExceptions(url);
-
-                try {
-                    loadingMyPage = true;
-                    Connector.loadPage(null, url);
-
-                    String head = "";
-                    String content = PageParser.GetTemplateInfo().GetContent().html();
-                    Elements links = PageParser.GetTemplateInfo().GetLinks();
-                    String[] newLinks = new String[links.size()];
-                    String[] newActions = new String[links.size()];
-                    int count = 0;
-                    boolean containsLogout = false;
-                    for (Element e : links) {
-                        newLinks[count] = e.text();
-                        newActions[count++] = e.attr("href");
-                        containsLogout |= e.text().equalsIgnoreCase("logout");
-                    }
-
-                    if(containsLogout) {
-                        NavigationDrawerFragment.updateLinks(newLinks);
-                        actions = newActions;
-                    }
-                    else{
-                        LoginActivity.returnToActivity(activity, "Unable to load page - returning to log in page");
-                        return;
-                    }
-
-                    html = templateHtml.replace("[[SCRIPTS]]", jqueryJs + bootstrapJs).replace("[[CSS]]", getCSS()).replace("[[HEAD]]", head).replace("[[CONTENT]]", content);
-                    html = html.replaceAll("<img", "<img class=\"img img-responsive\" ");
-                    html = html.replaceAll("<input", "<input class=\"btn btn-block\" ");
-                    html = html.replaceAll("width=\"([0-9]{1,4})\"", "");
-                    Log.d("html", html);
-
-                    view.stopLoading();
-                    view.loadDataWithBaseURL("http://www.samuraioflegend.com/", html, "text/html", "utf-8", "");
-                } catch (Exception e) {
-                    e.printStackTrace();
+                String newUrl = handlePostExceptions(url);
+                if(!newUrl.equals(url)){
+                    handlePageLoading(view, newUrl);
                 }
             }
 
@@ -161,12 +109,76 @@ public class InternetActivity extends BaseActivity {
 
         });
 
-        mWebView.loadUrl(pageUrl);
+        //mWebView.loadUrl(pageUrl);
+        handlePageLoading(mWebView, pageUrl);
 
         setTitle("SoL Mobile");
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+
+
+    private void handlePageLoading(WebView view, String url) {
+        Log.d("url", url);
+
+        if (url.contains("http") && !url.contains("samuraioflegend.com")) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
+            view.stopLoading();
+            return;
+        }
+
+        if(url.contains("login.php")){
+            LoginActivity.returnToActivity(activity, "You were automatically logged out");
+            return;
+        }
+
+        if (loadingMyPage) return;
+        currentUrl = url;
+        pageUrl = currentUrl;
+        url = url.replace("http://www.samuraioflegend.com", "");
+
+        url = handlePostExceptions(url);
+
+        try {
+            loadingMyPage = true;
+            Connector.loadPage(null, url);
+
+            String head = "";
+            String content = PageParser.GetTemplateInfo().GetContent().html();
+            Elements links = PageParser.GetTemplateInfo().GetLinks();
+            String[] newLinks = new String[links.size()];
+            String[] newActions = new String[links.size()];
+            int count = 0;
+            boolean containsLogout = false;
+            for (Element e : links) {
+                newLinks[count] = e.text();
+                newActions[count++] = e.attr("href");
+                containsLogout |= e.text().equalsIgnoreCase("logout");
+            }
+
+            if(containsLogout) {
+                NavigationDrawerFragment.updateLinks(newLinks);
+                actions = newActions;
+            }
+            else{
+                LoginActivity.returnToActivity(activity, "Unable to load page - returning to log in page");
+                return;
+            }
+
+            html = templateHtml.replace("[[SCRIPTS]]", jqueryJs + bootstrapJs).replace("[[CSS]]", getCSS()).replace("[[HEAD]]", head).replace("[[CONTENT]]", content);
+            html = html.replaceAll("<img", "<img class=\"img img-responsive\" ");
+            html = html.replaceAll("<input", "<input class=\"btn btn-block\" ");
+            html = html.replaceAll("width=\"([0-9]{1,4})\"", "");
+            Log.d("html", html);
+
+            view.stopLoading();
+            view.loadDataWithBaseURL("http://www.samuraioflegend.com/", html, "text/html", "utf-8", "");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private String handlePostExceptions(String url) {
@@ -240,7 +252,8 @@ public class InternetActivity extends BaseActivity {
 
     @Override
     public void refresh() {
-        mWebView.loadUrl(currentUrl);
+
+        handlePageLoading(mWebView, pageUrl);
     }
 
     /**
