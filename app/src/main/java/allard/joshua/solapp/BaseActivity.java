@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -68,13 +69,15 @@ public class BaseActivity extends AppCompatActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
+        Log.d("type", activity.getLocalClassName());
 
         if(!duringSetup) {
             if(actions[position].contains("logout.php")){
                 LoginActivity.returnToActivity(activity, "You have logged out");
                 return;
             }
-            InternetActivity.returnToActivity(activity, actions[position]);
+
+            activity.loadPage(activity, actions[position]);
         }
     }
 
@@ -174,6 +177,10 @@ public class BaseActivity extends AppCompatActivity
     }
 
     public void refresh(){
+
+    }
+
+    public void loadPage(BaseActivity activity, String url){
 
     }
 }

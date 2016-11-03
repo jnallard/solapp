@@ -54,6 +54,9 @@ public class PageParser {
             case BLACK:
                 templateParser = blackParser;
                 break;
+            case LOGGED_OUT:
+                templateParser = null;
+                return this;
         }
         templateParser.Parse(doc);
         return this;
@@ -87,11 +90,13 @@ public class PageParser {
                 return Templates.RED;
             case "style3.css":
                 return Templates.BLACK;
+            case "styles7.css":
+                return Templates.LOGGED_OUT;
         }
     }
 
     private enum Templates {
-        BLUE, GREEN, LATERNS, RED, BLACK
+        BLUE, GREEN, LATERNS, RED, BLACK, LOGGED_OUT
     }
 
 

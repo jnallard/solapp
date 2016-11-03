@@ -26,6 +26,7 @@ public class Connector {
 
     public static String username;
     public static String password;
+    public static String BASE_URL = "http://www.samuraioflegend.com";
     private static boolean running = true;
     private static Activity activity;
 
@@ -55,10 +56,10 @@ public class Connector {
                 java.net.CookieHandler.setDefault(cm);
 
                 String postMessage = "username=" + URLEncoder.encode(username, "utf-8") + "&password=" + URLEncoder.encode(password, "utf-8") + "&myselect=World+1&login=Login";
-                URL siteUrl = new URL("http://www.samuraioflegend.com/authenticate.php");
+                URL siteUrl = new URL(BASE_URL + "/authenticate.php");
                 // URL clanUrl = new
                 // URL("http://www.samuraioflegend.com/yourgang.php");
-                URL clanUrl = new URL("http://www.samuraioflegend.com/yourgang.php?action=forums");
+                URL clanUrl = new URL(BASE_URL + "/yourgang.php?action=forums");
 
                 List<String> lines = connectToUrl(postMessage, siteUrl);
                 Log.d("Debug", "3: " + lines.size());
@@ -76,7 +77,7 @@ public class Connector {
     }
 
     public static List<String> loadPage(String postMessage, String url) throws Exception {
-        URL siteUrl = new URL("http://www.samuraioflegend.com/" + url);
+        URL siteUrl = new URL(BASE_URL + "/" + url);
         loadPageRunner runner = new loadPageRunner(siteUrl, postMessage);
         synchronized (runner.o) {
 
@@ -136,7 +137,7 @@ public class Connector {
                 connection.setDoOutput(true);
                 connection.setRequestProperty("User-Agent",
                         "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36");
-                connection.setRequestProperty("Referer", "http://www.samuraioflegend.com/login.php");
+                connection.setRequestProperty("Referer", BASE_URL + "/login.php");
                 connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
                 connection.setRequestProperty("Accept-Language", "en-US,en;q=0.8");
                 connection.setRequestProperty("Accept",

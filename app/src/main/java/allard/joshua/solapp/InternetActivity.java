@@ -28,11 +28,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpCookie;
 import java.util.List;
+import java.util.Stack;
 
 import allard.joshua.solapp.parser.PageParser;
 
 public class InternetActivity extends BaseActivity {
-    public static final String TITLE = "SoL Mobile";
+    public static String TITLE = "SoL Mobile";
     private static String pageUrl;
 
     private static String solJs = "";
@@ -48,6 +49,8 @@ public class InternetActivity extends BaseActivity {
     private boolean loadingMyPage = false;
     private boolean pageHandled = false;
     private String currentUrl = "";
+
+    private Stack<String> history = new Stack<>();
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -141,14 +144,19 @@ public class InternetActivity extends BaseActivity {
 
         if (loadingMyPage) return;
         currentUrl = url;
+        history.push(url);
         pageUrl = currentUrl;
-        url = url.replace("http://www.samuraioflegend.com", "");
+        url = url.replace( Connector.BASE_URL, "");
 
         try {
             loadingMyPage = true;
             Connector.loadPage(null, url);
 
             String head = "";
+            if(PageParser.GetTemplateInfo() == null){
+                LoginActivity.returnToActivity(activity, "You were automatically logged out");
+                return;
+            }
             String content = PageParser.GetTemplateInfo().GetContent().html();
             Elements links = PageParser.GetTemplateInfo().GetLinks();
             String[] newLinks = new String[links.size()];
@@ -214,7 +222,7 @@ public class InternetActivity extends BaseActivity {
             Log.d("html", html);
 
             view.stopLoading();
-            view.loadDataWithBaseURL("http://www.samuraioflegend.com/", html, "text/html", "utf-8", "");
+            view.loadDataWithBaseURL(Connector.BASE_URL + "/", html, "text/html", "utf-8", "");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -241,7 +249,21 @@ public class InternetActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        mWebView.goBack();
+        if (mWebView.canGoBack() && !history.empty()) {
+            history.pop();
+            if(!history.empty()){
+                pageUrl = history.peek();
+                mWebView.goBack();
+                return;
+            }
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    public void loadPage(BaseActivity activity, String url) {
+        pageUrl = url;
+        handlePageLoading(mWebView, url);
     }
 
     public static void returnToActivity(final Activity activity, String url) {
@@ -252,7 +274,7 @@ public class InternetActivity extends BaseActivity {
         templateHtml = getFile(activity, "template.html");
 
         if (!url.startsWith("http"))
-            url = "http://www.samuraioflegend.com/" + url;
+            url = Connector.BASE_URL + "/" + url;
 
         Log.d("url", url);
 
@@ -294,7 +316,6 @@ public class InternetActivity extends BaseActivity {
 
     @Override
     public void refresh() {
-
         handlePageLoading(mWebView, pageUrl);
     }
 

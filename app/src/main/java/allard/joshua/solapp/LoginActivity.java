@@ -1,8 +1,6 @@
 package allard.joshua.solapp;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -13,25 +11,50 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TabHost;
 import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static String message = null;
 
-    EditText username;
-    EditText password;
+    EditText username1;
+    EditText password1;
+    EditText username2;
+    EditText password2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        TabHost mTabHost = (TabHost)findViewById(R.id.tabhost);
+        mTabHost.setup();
+
+        TabHost.TabSpec tab1 = mTabHost.newTabSpec("First Tab");
+        TabHost.TabSpec tab2 = mTabHost.newTabSpec("Second Tab");
+
+        // Set the Tab name and Activity
+        // that will be opened when particular Tab will be selected
+        tab1.setIndicator("World 1");
+        tab1.setContent(R.id.tab1);
+
+        tab2.setIndicator("World 2");
+        tab2.setContent(R.id.tab2);
+
+        mTabHost.addTab(tab1);
+        mTabHost.addTab(tab2);
+
+
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        username = (EditText) findViewById(R.id.editText);
-        username.setText(prefs.getString("usernameKey", ""));
-        password = (EditText) findViewById(R.id.editText2);
-        password.setText(prefs.getString("passwordKey", ""));
+        username1 = (EditText) findViewById(R.id.username1);
+        username1.setText(prefs.getString("usernameKey", ""));
+        password1 = (EditText) findViewById(R.id.password1);
+        password1.setText(prefs.getString("passwordKey", ""));
+        username2 = (EditText) findViewById(R.id.username2);
+        username2.setText(prefs.getString("username2Key", ""));
+        password2 = (EditText) findViewById(R.id.password2);
+        password2.setText(prefs.getString("password2Key", ""));
 
         if(message != null){
             Log.d("test", message);
@@ -41,14 +64,29 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void connectToSite(View view){
+    public void connectToSite1(View view){
 
-        String usernameText = username.getText().toString().trim();
-        String passwordText = password.getText().toString().trim();
+        String usernameText = username1.getText().toString().trim();
+        String passwordText = password1.getText().toString().trim();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().putString("usernameKey", usernameText).apply();
         prefs.edit().putString("passwordKey", passwordText).apply();
         //Log.d("Debug", "-1");
+        InternetActivity.TITLE = "SoL Mobile - World 1";
+        Connector.BASE_URL = "http://www.samuraioflegend.com";
+        Connector.login(this, usernameText, passwordText);
+    }
+
+    public void connectToSite2(View view){
+
+        String usernameText = username2.getText().toString().trim();
+        String passwordText = password2.getText().toString().trim();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().putString("username2Key", usernameText).apply();
+        prefs.edit().putString("password2Key", passwordText).apply();
+        //Log.d("Debug", "-1");
+        InternetActivity.TITLE = "SoL Mobile - World 2";
+        Connector.BASE_URL = "http://world2.samuraioflegend.com";
         Connector.login(this, usernameText, passwordText);
     }
 
