@@ -18,4 +18,9 @@ public class BlackTemplateParser extends BaseTemplateParser {
     public Elements GetLinks() {
         return doc.select("td[class=\"tiny4\"]").select("a");
     }
+
+    @Override
+    public Element GetNoLinksContent(){
+        return doc.select("center").get(1);
+    }
 }

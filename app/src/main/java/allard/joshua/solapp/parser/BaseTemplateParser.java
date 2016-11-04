@@ -34,4 +34,8 @@ public abstract class BaseTemplateParser {
     public Element GetContent(){
         return doc.select("td[width=\"83%\"]").first();
     }
+
+    public Element GetNoLinksContent(){
+        return doc.select("center").first();
+    }
 }

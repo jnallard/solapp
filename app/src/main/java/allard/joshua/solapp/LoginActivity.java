@@ -74,6 +74,7 @@ public class LoginActivity extends AppCompatActivity {
         //Log.d("Debug", "-1");
         InternetActivity.TITLE = "SoL Mobile - World 1";
         Connector.BASE_URL = "http://www.samuraioflegend.com";
+        Connector.WORLD_SELECT = "World+1";
         Connector.login(this, usernameText, passwordText);
     }
 
@@ -87,6 +88,7 @@ public class LoginActivity extends AppCompatActivity {
         //Log.d("Debug", "-1");
         InternetActivity.TITLE = "SoL Mobile - World 2";
         Connector.BASE_URL = "http://world2.samuraioflegend.com";
+        Connector.WORLD_SELECT = "World+2";
         Connector.login(this, usernameText, passwordText);
     }
 

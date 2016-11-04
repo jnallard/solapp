@@ -27,6 +27,7 @@ public class Connector {
     public static String username;
     public static String password;
     public static String BASE_URL = "http://www.samuraioflegend.com";
+    public static String WORLD_SELECT = "World+1";
     private static boolean running = true;
     private static Activity activity;
 
@@ -55,7 +56,7 @@ public class Connector {
                 cm = new java.net.CookieManager();
                 java.net.CookieHandler.setDefault(cm);
 
-                String postMessage = "username=" + URLEncoder.encode(username, "utf-8") + "&password=" + URLEncoder.encode(password, "utf-8") + "&myselect=World+1&login=Login";
+                String postMessage = "username=" + URLEncoder.encode(username, "utf-8") + "&password=" + URLEncoder.encode(password, "utf-8") + "&myselect=" + WORLD_SELECT + "&login=Login";
                 URL siteUrl = new URL(BASE_URL + "/authenticate.php");
                 // URL clanUrl = new
                 // URL("http://www.samuraioflegend.com/yourgang.php");

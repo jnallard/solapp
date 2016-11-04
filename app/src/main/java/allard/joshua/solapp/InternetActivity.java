@@ -109,7 +109,7 @@ public class InternetActivity extends BaseActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                loadingMyPage = false;
+                //loadingMyPage = false;
                 pageHandled = false;
             }
 
@@ -142,7 +142,7 @@ public class InternetActivity extends BaseActivity {
             return;
         }
 
-        if (loadingMyPage) return;
+        //if (loadingMyPage) return;
         currentUrl = url;
         history.push(url);
         pageUrl = currentUrl;
@@ -157,7 +157,18 @@ public class InternetActivity extends BaseActivity {
                 LoginActivity.returnToActivity(activity, "You were automatically logged out");
                 return;
             }
-            String content = PageParser.GetTemplateInfo().GetContent().html();
+            Element contentElement = PageParser.GetTemplateInfo().GetContent();
+            if(contentElement == null){
+                contentElement = PageParser.GetTemplateInfo().GetNoLinksContent();
+            }
+            if(contentElement == null){
+
+                Toast.makeText(this, "Cannot load page",
+                        Toast.LENGTH_LONG).show();
+                view.stopLoading();
+                return;
+            }
+            String content = contentElement.html();
             Elements links = PageParser.GetTemplateInfo().GetLinks();
             String[] newLinks = new String[links.size()];
             String[] newActions = new String[links.size()];
@@ -205,15 +216,8 @@ public class InternetActivity extends BaseActivity {
             else{
                 setTitle(TITLE);
             }
-
-            if(containsLogout) {
-                NavigationDrawerFragment.updateLinks(newLinks);
-                setActions(newActions);
-            }
-            else{
-                LoginActivity.returnToActivity(activity, "Unable to load page - returning to log in page");
-                return;
-            }
+            NavigationDrawerFragment.updateLinks(newLinks);
+            setActions(newActions);
 
             html = templateHtml.replace("[[SCRIPTS]]", jqueryJs + bootstrapJs).replace("[[CSS]]", getCSS()).replace("[[HEAD]]", head).replace("[[CONTENT]]", content);
             html = html.replaceAll("<img", "<img class=\"img img-responsive\" ");
