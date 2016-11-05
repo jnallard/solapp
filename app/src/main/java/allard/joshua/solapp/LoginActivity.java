@@ -33,8 +33,6 @@ public class LoginActivity extends AppCompatActivity {
         TabHost.TabSpec tab1 = mTabHost.newTabSpec("First Tab");
         TabHost.TabSpec tab2 = mTabHost.newTabSpec("Second Tab");
 
-        // Set the Tab name and Activity
-        // that will be opened when particular Tab will be selected
         tab1.setIndicator("World 1");
         tab1.setContent(R.id.tab1);
 
@@ -71,10 +69,9 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().putString("usernameKey", usernameText).apply();
         prefs.edit().putString("passwordKey", passwordText).apply();
-        //Log.d("Debug", "-1");
         InternetActivity.TITLE = "SoL Mobile - World 1";
-        Connector.BASE_URL = "http://www.samuraioflegend.com";
-        Connector.WORLD_SELECT = "World+1";
+        Connector.BaseUrl = "http://www.samuraioflegend.com";
+        Connector.WorldSelect = "World+1";
         Connector.login(this, usernameText, passwordText);
     }
 
@@ -85,10 +82,9 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().putString("username2Key", usernameText).apply();
         prefs.edit().putString("password2Key", passwordText).apply();
-        //Log.d("Debug", "-1");
         InternetActivity.TITLE = "SoL Mobile - World 2";
-        Connector.BASE_URL = "http://world2.samuraioflegend.com";
-        Connector.WORLD_SELECT = "World+2";
+        Connector.BaseUrl = "http://world2.samuraioflegend.com";
+        Connector.WorldSelect = "World+2";
         Connector.login(this, usernameText, passwordText);
     }
 

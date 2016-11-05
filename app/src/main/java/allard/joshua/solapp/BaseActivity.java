@@ -82,21 +82,6 @@ public class BaseActivity extends AppCompatActivity
     }
 
     public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                //mTitle = getString(R.string.title_section1);
-                //MainActivity.returnToMainActivity(false, this);
-                break;
-            case 2:
-                //mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                //mTitle = getString(R.string.title_section3);
-                break;
-            case 4:
-                //LoginActivity.returnToActivity(this);
-                break;
-        }
     }
 
     public void restoreActionBar() {

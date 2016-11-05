@@ -19,15 +19,12 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpCookie;
-import java.util.List;
 import java.util.Stack;
 
 import allard.joshua.solapp.parser.PageParser;
@@ -36,17 +33,13 @@ public class InternetActivity extends BaseActivity {
     public static String TITLE = "SoL Mobile";
     private static String pageUrl;
 
-    private static String solJs = "";
     private static String templateHtml = "";
     private static String jqueryJs = "";
     private static String bootstrapJs = "";
-    private static String bootstrapCss = "";
-    private static boolean isFirst;
     private static String setCookie = "";
     private WebView mWebView;
 
     private String html = "";
-    private boolean loadingMyPage = false;
     private boolean pageHandled = false;
     private String currentUrl = "";
 
@@ -85,8 +78,6 @@ public class InternetActivity extends BaseActivity {
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setAppCacheEnabled(true);
 
-        isFirst = true;
-
 
         mWebView.setWebChromeClient(new WebChromeClient());
         mWebView.setWebViewClient(new WebViewClient() {
@@ -109,16 +100,12 @@ public class InternetActivity extends BaseActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                //loadingMyPage = false;
                 pageHandled = false;
             }
 
         });
 
-        //mWebView.loadUrl(pageUrl);
         handlePageLoading(mWebView, pageUrl);
-
-        //setTitle(TITLE);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -142,15 +129,13 @@ public class InternetActivity extends BaseActivity {
             return;
         }
 
-        //if (loadingMyPage) return;
         currentUrl = url;
         history.push(url);
         pageUrl = currentUrl;
-        url = url.replace( Connector.BASE_URL, "");
+        url = url.replace( Connector.BaseUrl, "");
 
         try {
-            loadingMyPage = true;
-            Connector.loadPage(null, url);
+            Connector.loadPage(null, url, activity);
 
             String head = "";
             if(PageParser.GetTemplateInfo() == null){
@@ -177,7 +162,6 @@ public class InternetActivity extends BaseActivity {
             int mailCount = 0;
             int eventCount = 0;
             int announcementCount = 0;
-            boolean containsLogout = false;
             for (Element e : links) {
                 String text = e.text();
                 if(text.startsWith("You Have Mail")){
@@ -197,7 +181,6 @@ public class InternetActivity extends BaseActivity {
 
                 newLinks[count] = text;
                 newActions[count++] = e.attr("href");
-                containsLogout |= e.text().equalsIgnoreCase("logout");
             }
 
             if(mailCount + eventCount + announcementCount > 0){
@@ -226,7 +209,7 @@ public class InternetActivity extends BaseActivity {
             Log.d("html", html);
 
             view.stopLoading();
-            view.loadDataWithBaseURL(Connector.BASE_URL + "/", html, "text/html", "utf-8", "");
+            view.loadDataWithBaseURL(Connector.BaseUrl + "/", html, "text/html", "utf-8", "");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -243,12 +226,6 @@ public class InternetActivity extends BaseActivity {
             return url;
         }
         return null;
-    }
-
-    private String getCustomCss(String url){
-
-
-        return "";
     }
 
     @Override
@@ -271,14 +248,12 @@ public class InternetActivity extends BaseActivity {
     }
 
     public static void returnToActivity(final Activity activity, String url) {
-        solJs = getScript(activity, "solload.js");
         jqueryJs = getScript(activity, "jquery.min.js");
         bootstrapJs = getScript(activity, "bootstrap.min.js");
-        bootstrapCss = getScript(activity, "bootstrap.min.css");
         templateHtml = getFile(activity, "template.html");
 
         if (!url.startsWith("http"))
-            url = Connector.BASE_URL + "/" + url;
+            url = Connector.BaseUrl + "/" + url;
 
         Log.d("url", url);
 

@@ -17,8 +17,6 @@ import java.util.List;
 
 public abstract class BaseTemplateParser {
     protected Document doc = null;
-    public String User = "";
-    public String ID = "";
     public String Mails = "";
     public String Events = "";
 

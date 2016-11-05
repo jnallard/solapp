@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -26,10 +25,8 @@ public class Connector {
 
     public static String username;
     public static String password;
-    public static String BASE_URL = "http://www.samuraioflegend.com";
-    public static String WORLD_SELECT = "World+1";
-    private static boolean running = true;
-    private static Activity activity;
+    public static String BaseUrl = "http://www.samuraioflegend.com";
+    public static String WorldSelect = "World+1";
 
     public static boolean loggedIn = false;
 
@@ -38,13 +35,17 @@ public class Connector {
     public static void login(Activity main, String username, String password) {
         Connector.username = username;
         Connector.password = password;
-        Connector.activity = main;
-        runProgram runner = new runProgram();
+        runProgram runner = new runProgram(main);
         runner.start();
     }
 
 
     private static class runProgram extends Thread {
+        private Activity activity;
+
+        public runProgram(Activity activity){
+            this.activity = activity;
+        }
 
         @Override
         public void run() {
@@ -56,30 +57,26 @@ public class Connector {
                 cm = new java.net.CookieManager();
                 java.net.CookieHandler.setDefault(cm);
 
-                String postMessage = "username=" + URLEncoder.encode(username, "utf-8") + "&password=" + URLEncoder.encode(password, "utf-8") + "&myselect=" + WORLD_SELECT + "&login=Login";
-                URL siteUrl = new URL(BASE_URL + "/authenticate.php");
-                // URL clanUrl = new
-                // URL("http://www.samuraioflegend.com/yourgang.php");
-                URL clanUrl = new URL(BASE_URL + "/yourgang.php?action=forums");
+                String postMessage = "username=" + URLEncoder.encode(username, "utf-8") + "&password=" + URLEncoder.encode(password, "utf-8") + "&myselect=" + WorldSelect + "&login=Login";
+                URL siteUrl = new URL(BaseUrl + "/authenticate.php");
 
-                List<String> lines = connectToUrl(postMessage, siteUrl);
+                List<String> lines = connectToUrl(activity, postMessage, siteUrl);
                 Log.d("Debug", "3: " + lines.size());
                 if (lines.size() > 5) {
                     Connector.loggedIn = true;
                     PageParser.GetInstance().Parse(lines);
                     InternetActivity.returnToActivity(activity, "/explore.php");
                 }
-                //Connector.activity.text.setText("Success ");
 
             } catch (Exception e) {
-                //Connector.activity.text.setText("Error 1: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
 
-    public static List<String> loadPage(String postMessage, String url) throws Exception {
-        URL siteUrl = new URL(BASE_URL + "/" + url);
-        loadPageRunner runner = new loadPageRunner(siteUrl, postMessage);
+    public static List<String> loadPage(String postMessage, String url, Activity activity) throws Exception {
+        URL siteUrl = new URL(BaseUrl + "/" + url);
+        loadPageRunner runner = new loadPageRunner(siteUrl, postMessage, activity);
         synchronized (runner.o) {
 
             runner.start();
@@ -92,12 +89,14 @@ public class Connector {
 
         URL siteUrl;
         String postMessage;
-        public List<String> lines;
+        Activity activity;
+        List<String> lines;
         public Object o;
 
-        public loadPageRunner(URL siteUrl, String postMessage) {
+        public loadPageRunner(URL siteUrl, String postMessage, Activity activity) {
             this.siteUrl = siteUrl;
             this.postMessage = postMessage;
+            this.activity = activity;
             o = new Object();
         }
 
@@ -109,7 +108,7 @@ public class Connector {
 
                 try {
 
-                    lines = connectToUrl(postMessage, siteUrl);
+                    lines = connectToUrl(activity, postMessage, siteUrl);
                     //Connector.activity.text.setText("Success ");
 
                 } catch (Exception e) {
@@ -121,24 +120,20 @@ public class Connector {
         }
     }
 
-    private static List<String> connectToUrl(String postMessage, URL url) throws IOException {
+    private static List<String> connectToUrl(Activity activity, String postMessage, URL url) throws IOException {
 
         ConnectivityManager connMgr = (ConnectivityManager)
                 activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
             InputStream is = null;
-            // Only display the first 500 characters of the retrieved
-            // web page content.
-            int len = 500;
-
             try {
                 //URL url = new URL(siteUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setDoOutput(true);
                 connection.setRequestProperty("User-Agent",
                         "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36");
-                connection.setRequestProperty("Referer", BASE_URL + "/login.php");
+                connection.setRequestProperty("Referer", BaseUrl + "/login.php");
                 connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
                 connection.setRequestProperty("Accept-Language", "en-US,en;q=0.8");
                 connection.setRequestProperty("Accept",
@@ -191,17 +186,6 @@ public class Connector {
 
         List<String> lines = new ArrayList<String>();
         return lines;
-    }
-
-    // Reads an InputStream and converts it to a String.
-    public static String readIt(InputStream stream, int len) throws Exception {
-
-
-        Reader reader = null;
-        reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[len];
-        reader.read(buffer);
-        return new String(buffer);
     }
 
 

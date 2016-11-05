@@ -12,16 +12,16 @@ import java.util.List;
  */
 
 public class PageParser {
-    protected Document doc = null;
+    private Document doc = null;
 
-    BaseTemplateParser blueParser = new BlueTemplateParser();
-    BaseTemplateParser greenParser = new GreenTemplateParser();
-    BaseTemplateParser laternParser = new LaternTemplateParser();
-    BaseTemplateParser redParser = new RedTemplateParser();
-    BaseTemplateParser blackParser = new BlackTemplateParser();
+    private BaseTemplateParser blueParser = new BlueTemplateParser();
+    private BaseTemplateParser greenParser = new GreenTemplateParser();
+    private BaseTemplateParser laternParser = new LaternTemplateParser();
+    private BaseTemplateParser redParser = new RedTemplateParser();
+    private BaseTemplateParser blackParser = new BlackTemplateParser();
 
 
-    BaseTemplateParser templateParser = blueParser;
+    private BaseTemplateParser templateParser = blueParser;
 
     private PageParser(){
 
@@ -67,7 +67,6 @@ public class PageParser {
         for(String s: lines){
             page += s + "\n";
         }
-        //Spanned html = Html.fromHtml(page);
         return Jsoup.parse(page);
     }
 
@@ -87,6 +86,7 @@ public class PageParser {
             case "lantern/Lanterns.css":
                 return Templates.LATERNS;
             case "style_red.css":
+            case "style_red2.css":
                 return Templates.RED;
             case "style3.css":
                 return Templates.BLACK;
