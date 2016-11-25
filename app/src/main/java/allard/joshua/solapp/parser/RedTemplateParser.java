@@ -23,4 +23,11 @@ public class RedTemplateParser extends GreenTemplateParser {
     public String GetLinkColor() {
         return "#ff7800";
     }
+
+    @Override
+    public String GetStatus() {
+        String stats1 = getFormattedHtml(doc.select("td[width=\"237\"]").first());
+        String stats2 = getFormattedHtml(doc.select("td[class=\"player_stats_items\"]").first());
+        return stats1 + "<br />" + stats2;
+    }
 }

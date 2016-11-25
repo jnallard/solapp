@@ -17,6 +17,7 @@ public class PageParser {
     private BaseTemplateParser blueParser = new BlueTemplateParser();
     private BaseTemplateParser whiteParser = new WhiteTemplateParser();
     private BaseTemplateParser brownParser = new BrownTemplateParser();
+    private BaseTemplateParser orangeParser = new OrangeTemplateParser();
     private BaseTemplateParser greenParser = new GreenTemplateParser();
     private BaseTemplateParser laternParser = new LaternTemplateParser();
     private BaseTemplateParser redParser = new RedTemplateParser();
@@ -49,6 +50,9 @@ public class PageParser {
                 break;
             case BROWN:
                 templateParser = brownParser;
+                break;
+            case ORANGE:
+                templateParser = orangeParser;
                 break;
             case GREEN:
                 templateParser = greenParser;
@@ -94,6 +98,7 @@ public class PageParser {
             case "stylebrown.css":
                 return Templates.BROWN;
             case "http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700,600":
+                return Templates.ORANGE;
             case "lantern/Lanterns.css":
                 return Templates.LATERNS;
             case "style_red.css":
@@ -107,7 +112,7 @@ public class PageParser {
     }
 
     private enum Templates {
-        BLUE, WHITE, GREEN, LATERNS, RED, BLACK, LOGGED_OUT, BROWN
+        BLUE, WHITE, GREEN, LATERNS, RED, BLACK, LOGGED_OUT, BROWN, ORANGE
     }
 
 

@@ -7,7 +7,7 @@ import org.jsoup.select.Elements;
  * Created by Joshua on 10/14/2016.
  */
 
-public class LaternTemplateParser extends BaseTemplateParser {
+public class OrangeTemplateParser extends BaseTemplateParser {
 
     @Override
     public Element GetContent() {
@@ -36,8 +36,8 @@ public class LaternTemplateParser extends BaseTemplateParser {
 
     @Override
     public String GetStatus() {
-        String stats1 = getFormattedHtml(doc.select("td[width=\"237\"]").first());
-        String stats2 = getFormattedHtml(doc.select("td[width=\"178\"]").first());
+        String stats1 = getFormattedHtml(doc.select("td[width=\"250px\"]").first());
+        String stats2 = getFormattedHtml(doc.select("td[width=\"200\"]").first());
         return stats1 + "<br />" + stats2;
     }
 }

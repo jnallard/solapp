@@ -6,12 +6,16 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.Html;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -39,6 +43,8 @@ public class InternetActivity extends BaseActivity {
     private static String bootstrapJs = "";
     private static String setCookie = "";
     private WebView mWebView;
+    private WebView statusView;
+    private boolean showingStatus = false;
 
     private String html = "";
     private boolean pageHandled = false;
@@ -56,6 +62,15 @@ public class InternetActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.activity_internet);
         mWebView = (WebView) findViewById(R.id.webView);
+        statusView = (WebView) findViewById(R.id.status_view);
+        statusView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                showingStatus = true;
+                showStatus();
+                return true;
+            }
+        });
 
         final CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(this);
         final CookieManager cookieManager = CookieManager.getInstance();
@@ -156,6 +171,10 @@ public class InternetActivity extends BaseActivity {
                 view.stopLoading();
                 return;
             }
+
+            String statusHtml = PageParser.GetTemplateInfo().GetStatus();
+            statusView.loadDataWithBaseURL(Connector.BaseUrl + "/", statusHtml, "text/html", "utf-8", "");
+
             String content = contentElement.html();
             Elements links = parser.GetLinks();
             String[] newLinks = new String[links.size()];
@@ -300,6 +319,19 @@ public class InternetActivity extends BaseActivity {
     @Override
     public void refresh() {
         handlePageLoading(mWebView, pageUrl);
+    }
+
+    @Override
+    public void showStatus() {
+        showingStatus = !showingStatus;
+        if(showingStatus){
+            statusView.setVisibility(View.VISIBLE);
+            mWebView.setEnabled(false);
+        }
+        else{
+            statusView.setVisibility(View.GONE);
+            mWebView.setEnabled(true);
+        }
     }
 
     /**

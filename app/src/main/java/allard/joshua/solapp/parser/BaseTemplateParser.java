@@ -1,15 +1,8 @@
 package allard.joshua.solapp.parser;
 
-import android.os.Debug;
-import android.util.Log;
-
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import java.io.Console;
-import java.util.List;
 
 /**
  * Created by Joshua on 10/14/2016.
@@ -33,6 +26,12 @@ public abstract class BaseTemplateParser {
         return doc.select("td[width=\"83%\"]").first();
     }
 
+    public String GetStatus(){
+        String stats1 = getFormattedHtml(doc.select("td[width=\"220\"]").first());
+        String stats2 = getFormattedHtml(doc.select("td[width=\"262\"]").first());
+        return stats1 + "<br />" + stats2;
+    }
+
     public Element GetNoLinksContent(){
         return doc.select("center").first();
     }
@@ -42,4 +41,22 @@ public abstract class BaseTemplateParser {
     public String GetTextColor() { return "black"; }
 
     public String GetLinkColor() { return "white"; }
+
+    protected String getFormattedHtml(Element element){
+        if(element == null){
+            return "No content found";
+        }
+
+        for( Element e : element.getAllElements() )
+        {
+            if(e.tagName().equalsIgnoreCase("a")){
+                e.remove();
+            }
+            if(e.tagName().equalsIgnoreCase("font")){
+                e.removeAttr("color");
+            }
+        }
+
+        return element.html();
+    }
 }

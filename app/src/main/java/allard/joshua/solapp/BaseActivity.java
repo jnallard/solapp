@@ -1,13 +1,9 @@
 package allard.joshua.solapp;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,8 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import allard.joshua.solapp.parser.PageParser;
 
 /**
  * Created by Joshua on 11/3/2015.
@@ -117,6 +111,10 @@ public class BaseActivity extends AppCompatActivity
             refresh();
             return true;
         }
+        if (id == R.id.status) {
+            showStatus();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -162,6 +160,10 @@ public class BaseActivity extends AppCompatActivity
     }
 
     public void refresh(){
+
+    }
+
+    public void showStatus(){
 
     }
 

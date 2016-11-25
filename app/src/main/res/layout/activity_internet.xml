@@ -11,15 +11,29 @@
         >
 
         <WebView
-            android:layout_width="wrap_content"
+            android:text="TextView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/status_view"
+            android:visibility="gone"
+            android:gravity="center"
+            android:background="@drawable/status_dropdown"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:padding="20dp"/>
+
+        <WebView
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
             android:id="@+id/webView"
-            android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/status_view">
+
+        </WebView>
     </RelativeLayout>
 
     <!-- android:layout_gravity="start" tells DrawerLayout to treat

@@ -4,7 +4,7 @@
     <color name="transparent">#00000000</color>
 
     <color name="floating_action_button_color">#00CCFF</color>
-    <color name="action_bar_color">#00A3CC</color>
+    <color name="action_bar_color">#00a3cc</color>
     <color name="default_button_color">#5F6F7E</color>
     <color name="default_button_color_complete">#007A99</color>
     <color name="default_button_color_pressed">#5F6F7E</color>
@@ -13,4 +13,6 @@
     <color name="my_spinner_text_color">#FFFFFF</color>
     <color name="default_edit_text_color">#818181</color>
     <color name="blue_button_pressed">#00CCFF</color>
+
+    <color name="status_dropdown">#FFFFFF</color>
 </resources>

@@ -38,4 +38,11 @@ public class BlackTemplateParser extends BaseTemplateParser {
     public String GetTextColor() {
         return "#999";
     }
+
+    @Override
+    public String GetStatus() {
+        String stats1 = getFormattedHtml(doc.select("td[width=\"20%\"]").first());
+        String stats2 = getFormattedHtml(doc.select("th[width=\"20%\"]").first());
+        return stats1 + "<br />" + stats2;
+    }
 }
