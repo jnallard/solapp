@@ -23,4 +23,19 @@ public class BlackTemplateParser extends BaseTemplateParser {
     public Element GetNoLinksContent(){
         return doc.select("center").get(1);
     }
+
+    @Override
+    public String GetBGColor() {
+        return "background-image:url(\"images/tile.gif\");";
+    }
+
+    @Override
+    public String GetLinkColor() {
+        return "white";
+    }
+
+    @Override
+    public String GetTextColor() {
+        return "#999";
+    }
 }

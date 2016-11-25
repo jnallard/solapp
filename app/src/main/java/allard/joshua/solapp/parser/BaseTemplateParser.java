@@ -36,4 +36,10 @@ public abstract class BaseTemplateParser {
     public Element GetNoLinksContent(){
         return doc.select("center").first();
     }
+
+    public String GetBGColor() { return "background-color: #3C6B99;"; }
+
+    public String GetTextColor() { return "black"; }
+
+    public String GetLinkColor() { return "white"; }
 }

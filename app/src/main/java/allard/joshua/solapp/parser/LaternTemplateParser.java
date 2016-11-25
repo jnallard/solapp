@@ -18,4 +18,19 @@ public class LaternTemplateParser extends BaseTemplateParser {
     public Elements GetLinks() {
         return doc.select("div[class=\"leftnavlinks\"]").select("a");
     }
+
+    @Override
+    public String GetBGColor() {
+        return "background-color: #000000;";
+    }
+
+    @Override
+    public String GetLinkColor() {
+        return "#ff7800";
+    }
+
+    @Override
+    public String GetTextColor() {
+        return "white";
+    }
 }

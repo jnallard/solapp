@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.net.HttpCookie;
 import java.util.Stack;
 
+import allard.joshua.solapp.parser.BaseTemplateParser;
 import allard.joshua.solapp.parser.PageParser;
 
 public class InternetActivity extends BaseActivity {
@@ -137,14 +138,16 @@ public class InternetActivity extends BaseActivity {
         try {
             Connector.loadPage(null, url, activity);
 
+            BaseTemplateParser parser = PageParser.GetTemplateInfo();
+
             String head = "";
-            if(PageParser.GetTemplateInfo() == null){
+            if(parser == null){
                 LoginActivity.returnToActivity(activity, "You were automatically logged out");
                 return;
             }
-            Element contentElement = PageParser.GetTemplateInfo().GetContent();
+            Element contentElement = parser.GetContent();
             if(contentElement == null){
-                contentElement = PageParser.GetTemplateInfo().GetNoLinksContent();
+                contentElement = parser.GetNoLinksContent();
             }
             if(contentElement == null){
 
@@ -154,7 +157,7 @@ public class InternetActivity extends BaseActivity {
                 return;
             }
             String content = contentElement.html();
-            Elements links = PageParser.GetTemplateInfo().GetLinks();
+            Elements links = parser.GetLinks();
             String[] newLinks = new String[links.size()];
             String[] newActions = new String[links.size()];
             int count = 0;
@@ -169,12 +172,12 @@ public class InternetActivity extends BaseActivity {
                     Log.d("Mails", mailCount + "");
                 }
 
-                if(text.startsWith("Events")){
+                if(text.startsWith("Events") && text.contains("(")){
                     eventCount = Integer.parseInt(text.substring(text.indexOf("(") + 1, text.indexOf(")")));
                     Log.d("Events", eventCount + "");
                 }
 
-                if(text.startsWith("Announcements")){
+                if(text.startsWith("Announcements") && text.contains("(")){
                     announcementCount = Integer.parseInt(text.substring(text.indexOf("(") + 1, text.indexOf(")")));
                     Log.d("Announcements", announcementCount + "");
                 }
@@ -203,6 +206,7 @@ public class InternetActivity extends BaseActivity {
             setActions(newActions);
 
             html = templateHtml.replace("[[SCRIPTS]]", jqueryJs + bootstrapJs).replace("[[CSS]]", getCSS()).replace("[[HEAD]]", head).replace("[[CONTENT]]", content);
+            html = html.replace("[[BG_COLOR]]", parser.GetBGColor()).replace("[[TEXT_COLOR]]", parser.GetTextColor()).replace("[[LINK_COLOR]]", parser.GetLinkColor());
             html = html.replaceAll("<img", "<img class=\"img img-responsive\" ");
             html = html.replaceAll("<input", "<input class=\"btn btn-block\" ");
             html = html.replaceAll("width=\"([0-9]{1,4})\"", "");

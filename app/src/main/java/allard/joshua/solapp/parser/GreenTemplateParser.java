@@ -18,4 +18,19 @@ public class GreenTemplateParser extends BaseTemplateParser {
     public Elements GetLinks() {
         return doc.select("div[class=\"box\"]").select("a");
     }
+
+    @Override
+    public String GetBGColor() {
+        return "background-color: #172101;";
+    }
+
+    @Override
+    public String GetTextColor() {
+        return "white";
+    }
+
+    @Override
+    public String GetLinkColor() {
+        return "#ffdd00";
+    }
 }

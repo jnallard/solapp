@@ -8,4 +8,19 @@ import org.jsoup.select.Elements;
  */
 
 public class RedTemplateParser extends GreenTemplateParser {
+
+    @Override
+    public String GetBGColor() {
+        return "background-image: url(bg.png);";
+    }
+
+    @Override
+    public String GetTextColor() {
+        return "white";
+    }
+
+    @Override
+    public String GetLinkColor() {
+        return "#ff7800";
+    }
 }
