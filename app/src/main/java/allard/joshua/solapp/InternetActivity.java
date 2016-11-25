@@ -173,7 +173,21 @@ public class InternetActivity extends BaseActivity {
             }
 
             String statusHtml = PageParser.GetTemplateInfo().GetStatus();
-            statusView.loadDataWithBaseURL(Connector.BaseUrl + "/", statusHtml, "text/html", "utf-8", "");
+            statusView.loadDataWithBaseURL(Connector.BaseUrl + "/" + url, statusHtml, "text/html", "utf-8", "");
+
+            Elements forms = contentElement.select("table > form");
+            for(Element form: forms){
+                Element parent = form.parent();
+                form.remove();
+                Element tr = parent.appendElement("tr");
+                Element td = tr.appendElement("td");
+                td.appendChild(form);
+                for(Element input: parent.parent().select("input")){
+                    input.remove();
+                    form.appendChild(input);
+                }
+
+            }
 
             String content = contentElement.html();
             Elements links = parser.GetLinks();
@@ -232,7 +246,7 @@ public class InternetActivity extends BaseActivity {
             Log.d("html", html);
 
             view.stopLoading();
-            view.loadDataWithBaseURL(Connector.BaseUrl + "/", html, "text/html", "utf-8", "");
+            view.loadDataWithBaseURL(Connector.BaseUrl + "/" + url, html, "text/html", "utf-8", "");
         } catch (Exception e) {
             e.printStackTrace();
         }
