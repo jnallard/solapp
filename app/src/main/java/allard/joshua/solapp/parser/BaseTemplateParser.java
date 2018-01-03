@@ -1,5 +1,7 @@
 package allard.joshua.solapp.parser;
 
+import android.util.Log;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -13,8 +15,36 @@ public abstract class BaseTemplateParser {
     public String Mails = "";
     public String Events = "";
 
+    int mailCount = 0;
+    int eventCount = 0;
+    int announcementCount = 0;
+
     public void Parse(Document doc){
         this.doc = doc;
+
+        mailCount = 0;
+        eventCount = 0;
+        announcementCount = 0;
+
+        Elements links = GetLinks();
+
+        for (Element e : links) {
+            String text = e.text();
+            if(text.startsWith("You Have Mail")){
+                mailCount = Integer.parseInt(text.substring(text.indexOf("(") + 1, text.indexOf(")")));
+                Log.d("Mails", mailCount + "");
+            }
+
+            if(text.startsWith("Events") && text.contains("(")){
+                eventCount = Integer.parseInt(text.substring(text.indexOf("(") + 1, text.indexOf(")")));
+                Log.d("Events", eventCount + "");
+            }
+
+            if(text.startsWith("Announcements") && text.contains("(")){
+                announcementCount = Integer.parseInt(text.substring(text.indexOf("(") + 1, text.indexOf(")")));
+                Log.d("Announcements", announcementCount + "");
+            }
+        }
     }
 
 
@@ -41,6 +71,18 @@ public abstract class BaseTemplateParser {
     public String GetTextColor() { return "black"; }
 
     public String GetLinkColor() { return "white"; }
+
+    public int GetMailCount() {
+        return this.mailCount;
+    }
+
+    public int GetEventCount() {
+        return this.eventCount;
+    }
+
+    public int GetAnnouncementCount() {
+        return this.announcementCount;
+    }
 
     protected String getFormattedHtml(Element element){
         if(element == null){

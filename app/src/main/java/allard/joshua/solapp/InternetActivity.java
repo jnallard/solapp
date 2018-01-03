@@ -1,6 +1,7 @@
 package allard.joshua.solapp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -60,7 +61,14 @@ public class InternetActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState, R.layout.activity_internet);
+
+        if(pageUrl == null){
+            LoginActivity.returnToActivity(this, "You need to log in");
+            return;
+        }
+
         mWebView = (WebView) findViewById(R.id.webView);
         statusView = (WebView) findViewById(R.id.status_view);
         statusView.setOnTouchListener(new View.OnTouchListener() {
@@ -204,27 +212,11 @@ public class InternetActivity extends BaseActivity {
             String[] newActions = new String[links.size()];
             int count = 0;
 
-            int mailCount = 0;
-            int eventCount = 0;
-            int announcementCount = 0;
+            int mailCount = parser.GetMailCount();
+            int eventCount = parser.GetEventCount();
+            int announcementCount = parser.GetAnnouncementCount();
             for (Element e : links) {
-                String text = e.text();
-                if(text.startsWith("You Have Mail")){
-                    mailCount = Integer.parseInt(text.substring(text.indexOf("(") + 1, text.indexOf(")")));
-                    Log.d("Mails", mailCount + "");
-                }
-
-                if(text.startsWith("Events") && text.contains("(")){
-                    eventCount = Integer.parseInt(text.substring(text.indexOf("(") + 1, text.indexOf(")")));
-                    Log.d("Events", eventCount + "");
-                }
-
-                if(text.startsWith("Announcements") && text.contains("(")){
-                    announcementCount = Integer.parseInt(text.substring(text.indexOf("(") + 1, text.indexOf(")")));
-                    Log.d("Announcements", announcementCount + "");
-                }
-
-                newLinks[count] = text;
+                newLinks[count] = e.text();
                 newActions[count++] = e.attr("href");
             }
 
@@ -316,7 +308,7 @@ public class InternetActivity extends BaseActivity {
         activity.finish();
     }
 
-    private static String getScript(Activity activity, String filename) {
+    private static String getScript(Context activity, String filename) {
         String file = getFile(activity, filename);
 
         Log.d("file", file);
@@ -324,7 +316,7 @@ public class InternetActivity extends BaseActivity {
     }
 
     @NonNull
-    private static String getFile(Activity activity, String filename) {
+    private static String getFile(Context activity, String filename) {
         String file = "";
         try {
             InputStreamReader is = new InputStreamReader(activity.getAssets()

@@ -32,7 +32,7 @@ public class Connector {
 
     public static java.net.CookieManager cm;
 
-    public static void login(Activity main, String username, String password) {
+    public static void login(Context main, String username, String password) {
         Connector.username = username;
         Connector.password = password;
         runProgram runner = new runProgram(main);
@@ -41,9 +41,9 @@ public class Connector {
 
 
     private static class runProgram extends Thread {
-        private Activity activity;
+        private Context activity;
 
-        public runProgram(Activity activity){
+        public runProgram(Context activity){
             this.activity = activity;
         }
 
@@ -65,7 +65,9 @@ public class Connector {
                 if (lines.size() > 5) {
                     Connector.loggedIn = true;
                     PageParser.GetInstance().Parse(lines);
-                    InternetActivity.returnToActivity(activity, "/explore.php");
+                    if(activity instanceof Activity) {
+                        InternetActivity.returnToActivity((Activity)activity, "/explore.php");
+                    }
                 }
 
             } catch (Exception e) {
@@ -74,7 +76,7 @@ public class Connector {
         }
     }
 
-    public static List<String> loadPage(String postMessage, String url, Activity activity) throws Exception {
+    public static List<String> loadPage(String postMessage, String url, Context activity) throws Exception {
         URL siteUrl = new URL(BaseUrl + "/" + url);
         loadPageRunner runner = new loadPageRunner(siteUrl, postMessage, activity);
         synchronized (runner.o) {
@@ -89,11 +91,11 @@ public class Connector {
 
         URL siteUrl;
         String postMessage;
-        Activity activity;
+        Context activity;
         List<String> lines;
         public Object o;
 
-        public loadPageRunner(URL siteUrl, String postMessage, Activity activity) {
+        public loadPageRunner(URL siteUrl, String postMessage, Context activity) {
             this.siteUrl = siteUrl;
             this.postMessage = postMessage;
             this.activity = activity;
@@ -120,7 +122,7 @@ public class Connector {
         }
     }
 
-    private static List<String> connectToUrl(Activity activity, String postMessage, URL url) throws IOException {
+    private static List<String> connectToUrl(Context activity, String postMessage, URL url) throws IOException {
 
         ConnectivityManager connMgr = (ConnectivityManager)
                 activity.getSystemService(Context.CONNECTIVITY_SERVICE);

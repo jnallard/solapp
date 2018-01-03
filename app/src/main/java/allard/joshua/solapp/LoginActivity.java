@@ -68,6 +68,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void connectToSite1(View view){
+        NotificationEventReceiver.setupAlarm(getApplicationContext());
         loadingBar.setVisibility(View.VISIBLE);
 
         String usernameText = username1.getText().toString().trim();
@@ -82,6 +83,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void connectToSite2(View view){
+        NotificationEventReceiver.setupAlarm(getApplicationContext());
         loadingBar.setVisibility(View.VISIBLE);
 
         String usernameText = username2.getText().toString().trim();
