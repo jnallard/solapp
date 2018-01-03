@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.text.Html;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,7 +14,7 @@ import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -44,6 +43,7 @@ public class InternetActivity extends BaseActivity {
     private static String setCookie = "";
     private WebView mWebView;
     private WebView statusView;
+    private ProgressBar loadingBar;
     private boolean showingStatus = false;
 
     private String html = "";
@@ -71,6 +71,7 @@ public class InternetActivity extends BaseActivity {
                 return true;
             }
         });
+        loadingBar = (ProgressBar) findViewById(R.id.progressBar);
 
         final CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(this);
         final CookieManager cookieManager = CookieManager.getInstance();
@@ -101,7 +102,7 @@ public class InternetActivity extends BaseActivity {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 cookieManager.setCookie(url, setCookie);
                 view.stopLoading();
-                handlePageLoading(view, url);
+                handlePageLoadingAsync(view, url);
                 return true;
             }
 
@@ -109,7 +110,7 @@ public class InternetActivity extends BaseActivity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 String newUrl = handlePostExceptions(url);
                 if(newUrl != null && !pageHandled){
-                    handlePageLoading(view, newUrl);
+                    handlePageLoadingAsync(view, newUrl);
                 }
             }
 
@@ -117,19 +118,27 @@ public class InternetActivity extends BaseActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 pageHandled = false;
+                loadingBar.setVisibility(View.INVISIBLE);
             }
 
         });
 
-        handlePageLoading(mWebView, pageUrl);
+        handlePageLoadingAsync(mWebView, pageUrl);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
+    private void handlePageLoadingAsync(final WebView view, final String url) {
+        loadingBar.setVisibility(View.VISIBLE);
+        view.post(new Runnable() {
+            public void run() {
+                handlePageLoad(view, url);
+            }
+        });
+    }
 
-
-    private void handlePageLoading(WebView view, String url) {
+    private void handlePageLoad(WebView view, String url) {
         Log.d("url", url);
         pageHandled = true;
 
@@ -270,8 +279,14 @@ public class InternetActivity extends BaseActivity {
         if (mWebView.canGoBack() && !history.empty()) {
             history.pop();
             if(!history.empty()){
+                loadingBar.setVisibility(View.VISIBLE);
                 pageUrl = history.peek();
-                mWebView.goBack();
+                mWebView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mWebView.goBack();
+                    }
+                });
                 return;
             }
         }
@@ -281,7 +296,7 @@ public class InternetActivity extends BaseActivity {
     @Override
     public void loadPage(BaseActivity activity, String url) {
         pageUrl = url;
-        handlePageLoading(mWebView, url);
+        handlePageLoadingAsync(mWebView, url);
     }
 
     public static void returnToActivity(final Activity activity, String url) {
@@ -332,7 +347,7 @@ public class InternetActivity extends BaseActivity {
 
     @Override
     public void refresh() {
-        handlePageLoading(mWebView, pageUrl);
+        handlePageLoadingAsync(mWebView, pageUrl);
     }
 
     @Override

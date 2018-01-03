@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.Toast;
 
@@ -22,6 +23,8 @@ public class LoginActivity extends AppCompatActivity {
     EditText password1;
     EditText username2;
     EditText password2;
+    ProgressBar loadingBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +57,8 @@ public class LoginActivity extends AppCompatActivity {
         password2 = (EditText) findViewById(R.id.password2);
         password2.setText(prefs.getString("password2Key", ""));
 
+        loadingBar = (ProgressBar) findViewById(R.id.progressBarLogin);
+
         if(message != null){
             Log.d("test", message);
             Toast.makeText(this, message,
@@ -63,6 +68,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void connectToSite1(View view){
+        loadingBar.setVisibility(View.VISIBLE);
 
         String usernameText = username1.getText().toString().trim();
         String passwordText = password1.getText().toString().trim();
@@ -76,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void connectToSite2(View view){
+        loadingBar.setVisibility(View.VISIBLE);
 
         String usernameText = username2.getText().toString().trim();
         String passwordText = password2.getText().toString().trim();

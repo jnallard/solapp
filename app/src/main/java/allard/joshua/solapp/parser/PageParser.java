@@ -106,7 +106,7 @@ public class PageParser {
                 return Templates.RED;
             case "style3.css":
                 return Templates.BLACK;
-            case "styles7.css":
+            case "stylesfb.css":
                 return Templates.LOGGED_OUT;
         }
     }
