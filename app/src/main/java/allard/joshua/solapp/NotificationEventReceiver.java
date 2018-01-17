@@ -9,6 +9,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
+import org.jsoup.nodes.Element;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -43,16 +45,26 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
             Log.d("Connect-Notification", Connector.loggedIn + "");
 
             BaseTemplateParser parser = PageParser.GetTemplateInfo();
+            Intent serviceIntent = null;
             if(parser.GetMailCount() + parser.GetEventCount() + parser.GetAnnouncementCount() > 0){
-                Intent serviceIntent = null;
                 if (ACTION_START_NOTIFICATION_SERVICE.equals(action)) {
                     Log.i(getClass().getSimpleName(), "onReceive from alarm, starting notification service");
                     serviceIntent = NotificationService.createIntentStartNotificationService(context);
                 }
+            }
+            else {
+                serviceIntent = NotificationService.createIntentDeleteNotification(context);
+            }
 
-                if (serviceIntent != null) {
-                    startWakefulService(context, serviceIntent);
-                }
+            if (serviceIntent != null) {
+                startWakefulService(context, serviceIntent);
+            }
+
+            Element link;
+            int tries = 0;
+            while((link = parser.GetLinkWithText("Med Use")) != null && tries++ <= 10){
+                Connector.loadPage(null, link.attr("href"), context);
+                parser = PageParser.GetTemplateInfo();
             }
         } catch (Exception e) {
             e.printStackTrace();

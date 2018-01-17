@@ -62,7 +62,9 @@ public class NotificationService extends IntentService {
     }
 
     private void processDeleteNotification(Intent intent) {
-        // Log something?
+
+        final NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancelAll();
     }
 
     private void processStartNotification() {

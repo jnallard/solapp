@@ -84,6 +84,10 @@ public abstract class BaseTemplateParser {
         return this.announcementCount;
     }
 
+    public Element GetLinkWithText(String text) {
+        return GetLinks().select(String.format("a:contains(%s)", text)).first();
+    }
+
     protected String getFormattedHtml(Element element){
         if(element == null){
             return "No content found";
