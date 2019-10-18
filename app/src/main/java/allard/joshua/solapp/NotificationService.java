@@ -91,7 +91,7 @@ public class NotificationService extends IntentService {
         builder.setContentTitle("SoL Updates")
                 .setAutoCancel(true)
                 .setColor(getResources().getColor(R.color.action_bar_color))
-                .setContentText(message).setSmallIcon(R.drawable.round_button);
+                .setContentText(message).setSmallIcon(R.drawable.notification_icon);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 NOTIFICATION_ID,

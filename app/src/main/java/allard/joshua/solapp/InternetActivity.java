@@ -169,6 +169,7 @@ public class InternetActivity extends BaseActivity {
 
         try {
             Connector.loadPage(null, url, activity);
+            NotificationEventReceiver.triggerNow(getApplicationContext());
 
             BaseTemplateParser parser = PageParser.GetTemplateInfo();
 
