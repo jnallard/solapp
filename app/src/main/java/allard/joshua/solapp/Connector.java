@@ -22,6 +22,7 @@ import allard.joshua.solapp.parser.PageParser;
 
 
 public class Connector {
+    private static final int TIMEOUT_MILLIS = 600000;
 
     public static String username;
     public static String password;
@@ -132,6 +133,8 @@ public class Connector {
             try {
                 //URL url = new URL(siteUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(TIMEOUT_MILLIS);
+                connection.setReadTimeout(TIMEOUT_MILLIS);
                 connection.setDoOutput(true);
                 connection.setRequestProperty("User-Agent",
                         "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36");
