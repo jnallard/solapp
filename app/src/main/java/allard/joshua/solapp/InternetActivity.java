@@ -23,7 +23,10 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
@@ -31,6 +34,8 @@ import java.io.InputStreamReader;
 import java.net.HttpCookie;
 import java.util.Stack;
 
+import allard.joshua.solapp.page.correction.IPageCorrector;
+import allard.joshua.solapp.page.correction.PageCorrectionFactory;
 import allard.joshua.solapp.parser.BaseTemplateParser;
 import allard.joshua.solapp.parser.PageParser;
 
@@ -118,6 +123,7 @@ public class InternetActivity extends BaseActivity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 String newUrl = handlePostExceptions(url);
                 if(newUrl != null && !pageHandled){
+                    pageHandled = true;
                     handlePageLoadingAsync(view, newUrl);
                 }
             }
@@ -245,6 +251,11 @@ public class InternetActivity extends BaseActivity {
             html = html.replaceAll("<img", "<img class=\"img img-responsive\" ");
             html = html.replaceAll("<input", "<input class=\"btn btn-block\" ");
             html = html.replaceAll("width=\"([0-9]{1,4})\"", "");
+            IPageCorrector pageCorrector = PageCorrectionFactory.getInstance().getPageCorrector(url);
+            Document doc = Jsoup.parse(html);
+            if(pageCorrector != null) {
+                html = pageCorrector.correctPage(doc);
+            }
             Log.d("html", html);
 
             view.stopLoading();
