@@ -3,5 +3,5 @@ package allard.joshua.solapp.page.correction;
 import org.jsoup.nodes.Document;
 
 public interface IPageCorrector {
-    String correctPage(Document document);
+    void correctPage(Document document);
 }

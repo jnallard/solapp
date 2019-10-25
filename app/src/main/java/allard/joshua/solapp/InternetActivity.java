@@ -252,13 +252,15 @@ public class InternetActivity extends BaseActivity {
             html = templateHtml.replace("[[SCRIPTS]]", jqueryJs + bootstrapJs).replace("[[CSS]]", getCSS()).replace("[[HEAD]]", head).replace("[[CONTENT]]", content);
             html = html.replace("[[BG_COLOR]]", parser.GetBGColor()).replace("[[TEXT_COLOR]]", parser.GetTextColor()).replace("[[LINK_COLOR]]", parser.GetLinkColor());
             html = html.replaceAll("width=\"([0-9]{1,4})\"", "");
+            html = html.replaceAll("align=\"left\" width=\"75px\" height=\"75px\"", "");
             IPageCorrector pageCorrector = PageCorrectionFactory.getInstance().getPageCorrector(url);
             Document doc = Jsoup.parse(html);
             doc.select("img").addClass("img").addClass("img-responsive");
             doc.select("input").addClass("btn").addClass("btn-block");
             if(pageCorrector != null) {
-                html = pageCorrector.correctPage(doc);
+                pageCorrector.correctPage(doc);
             }
+            html = doc.html();
             Log.d("html", html);
 
             view.stopLoading();

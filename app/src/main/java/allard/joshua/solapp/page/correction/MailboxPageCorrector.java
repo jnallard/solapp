@@ -9,7 +9,7 @@ import org.jsoup.select.Elements;
 
 public class MailboxPageCorrector implements IPageCorrector {
     @Override
-    public String correctPage(Document doc) {
+    public void correctPage(Document doc) {
         Elements messageButtonsTable = doc.select("table[width=\"80%\"]");
         for(Element element: messageButtonsTable) {
             element.select("tr").tagName("div").addClass("row");
@@ -27,8 +27,5 @@ public class MailboxPageCorrector implements IPageCorrector {
             }
         }
         Log.d("new-html", messageButtonsTable.html());
-        String html = doc.html();
-        html = html.replaceAll("align=\"left\" width=\"75px\" height=\"75px\"", "");
-        return html;
     }
 }
