@@ -13,6 +13,7 @@ import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
@@ -115,6 +116,7 @@ public class InternetActivity extends BaseActivity {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 cookieManager.setCookie(url, setCookie);
                 view.stopLoading();
+                pageHandled = true;
                 handlePageLoadingAsync(view, url);
                 return true;
             }
@@ -124,6 +126,7 @@ public class InternetActivity extends BaseActivity {
                 String newUrl = handlePostExceptions(url);
                 if(newUrl != null && !pageHandled){
                     pageHandled = true;
+                    view.stopLoading();
                     handlePageLoadingAsync(view, newUrl);
                 }
             }
@@ -248,11 +251,11 @@ public class InternetActivity extends BaseActivity {
 
             html = templateHtml.replace("[[SCRIPTS]]", jqueryJs + bootstrapJs).replace("[[CSS]]", getCSS()).replace("[[HEAD]]", head).replace("[[CONTENT]]", content);
             html = html.replace("[[BG_COLOR]]", parser.GetBGColor()).replace("[[TEXT_COLOR]]", parser.GetTextColor()).replace("[[LINK_COLOR]]", parser.GetLinkColor());
-            html = html.replaceAll("<img", "<img class=\"img img-responsive\" ");
-            html = html.replaceAll("<input", "<input class=\"btn btn-block\" ");
             html = html.replaceAll("width=\"([0-9]{1,4})\"", "");
             IPageCorrector pageCorrector = PageCorrectionFactory.getInstance().getPageCorrector(url);
             Document doc = Jsoup.parse(html);
+            doc.select("img").addClass("img").addClass("img-responsive");
+            doc.select("input").addClass("btn").addClass("btn-block");
             if(pageCorrector != null) {
                 html = pageCorrector.correctPage(doc);
             }
@@ -272,8 +275,8 @@ public class InternetActivity extends BaseActivity {
         if (url.contains("/mailbox.php?action=send")) {
             return url.replace("?action=send", "");
         }
-        if (url.contains("/viewuser.php?u=")) {
-            return url;
+        if (url.contains("/viewuser.php?u=") && url.contains("&comment-sol-app=true")) {
+            return url.replace("&comment-sol-app=true", "");
         }
         return null;
     }

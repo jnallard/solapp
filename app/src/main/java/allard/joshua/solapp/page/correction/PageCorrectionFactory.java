@@ -14,6 +14,9 @@ public class PageCorrectionFactory {
         if(url.contains("mailbox.php")) {
             return new MailboxPageCorrector();
         }
+        if(url.contains("viewuser.php")) {
+            return new ViewUserPageCorrector();
+        }
         return null;
     }
 }
